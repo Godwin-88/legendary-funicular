@@ -1,0 +1,37 @@
+# MLOps & Orchestration
+mlflow
+dvc[s3]
+evidently
+apache-airflow
+prometheus-client
+
+# ML & Deep Reinforcement Learning
+torch
+gymnasium
+stable-baselines3[extra]
+numpy
+pandas
+scikit-learn
+pyarrow
+
+# API & Services
+fastapi
+uvicorn[standard]
+
+# Graph Database (Neo4j)
+neo4j
+node2vec
+
+# Blockchain (Ethereum)
+web3
+
+# Tooling & Code Quality
+pytest
+pytest-cov
+ruff
+black
+mypy
+
+# Utilities
+python-dotenv
+loguru
