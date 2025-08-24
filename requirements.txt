@@ -1,5 +1,5 @@
 # Data Sourcing
-openbb
+openbb[all]
 
 # MLOps & Orchestration
 mlflow

@@ -15,15 +15,17 @@ Created a multi-stage `Dockerfile` to build container images for the project's s
 
 ## Step 2: Dependencies
 
-Populated the `requirements.txt` file with a comprehensive list of Python libraries required for the project, based on the architecture described in `context.md`. The dependencies are grouped into the following categories:
+Populated the `requirements.txt` file with a comprehensive list of Python libraries required for the project, based on the architecture described in `context.md`.
 
-- MLOps & Orchestration
-- ML & Deep Reinforcement Learning
-- API & Services
-- Graph Database (Neo4j)
-- Blockchain (Ethereum)
-- Tooling & Code Quality
-- Utilities
+**Key Features:**
+- **MLOps & Orchestration**
+- **ML & Deep Reinforcement Learning**
+- **API & Services**
+- **Graph Database (Neo4j)**
+- **Blockchain (Ethereum)**
+- **Tooling & Code Quality**
+- **Utilities**
+- **Data Sourcing**
 
 ## Step 3: Terraform Baseline
 
@@ -70,6 +72,14 @@ Azure's free offering is a strong contender, with one significant advantage for 
 - **The Big Advantage: Kubernetes (AKS):** The **AKS cluster management is completely free**. You only pay for the worker node VMs.
 - **Recommendation:** Azure is likely more cost-effective for the **infrastructure and orchestration** part of this project due to the free AKS management. The most significant cost, model training, will be a paid service on both platforms.
 
+#### Google Cloud Platform (GCP)
+
+GCP is another excellent platform for this project, with strong open-source roots and a competitive free tier.
+
+- **Key Advantage: Kubernetes (GKE):** Like Azure, GCP offers **free cluster management** for one GKE cluster, making it very cost-effective for orchestration.
+- **S3 Compatibility:** Google Cloud Storage (GCS) offers an S3-compatible API mode, meaning our tools like MLflow and DVC can connect to it with minimal changes.
+- **Recommendation:** GCP is highly competitive with Azure for this project. The choice between them often comes down to team preference, as both provide a cost-effective way to run the core Kubernetes infrastructure, while heavy model training remains a paid service on all platforms.
+
 ## Step 4: Adopting an Open Source, Self-Hosted Strategy
 
 Pivoting from a cloud-first approach to a self-hosted stack to eliminate cloud costs during development and ensure the entire system can run locally.
@@ -115,7 +125,7 @@ Use `kubectl port-forward` to access services from your local machine. For examp
 - **Neo4j (Project Instance):**
   *To avoid conflicts with other local Neo4j instances, we will forward to alternate ports.*
   ```sh
-  kubectl port-forward service/neo4j-service 8474:7474 8687:7687
+  kubectl port-forward service/neo4j-service 8474:7474 8687:8687
   ```
   *Access the HTTP console at: `http://localhost:8474`*
   *Connect clients to the Bolt port at: `bolt://localhost:8687`*
@@ -128,6 +138,30 @@ Upgraded the graph schema in `graphs/schema.cql` to a production-grade version t
 - Models a wide range of financial, blockchain, market, and ML entities.
 - Includes robust constraints and indexes for data integrity and query performance.
 - Establishes clear data lineage and audit trails for compliance.
+
+## Step 7: Starting the OpenBB Backend (Docker Method)
+
+To run the OpenBB Platform backend, the official and most reliable method is to use the provided Docker container. This avoids complex Python dependency issues.
+
+**Command:**
+```sh
+docker run -d -p 6900:8000 --name openbb-backend ghcr.io/openbb-finance/openbb-platform
+```
+This command downloads the official image from the GitHub Container Registry and runs the backend server, making it accessible on `http://localhost:6900`.
+
+## Step 8: Created Initial ETL Script with OpenBB
+
+Created the first version of the ETL script at `graphs/etl/ingest.py`.
+
+**Functionality:**
+- Connects to the local Neo4j instance.
+- Uses the `openbb` Python SDK to fetch real historical stock data.
+- Ingests the data into the graph, creating `Asset` and `OHLCV` nodes according to our schema.
+
+**How to Run:**
+1.  Ensure the Neo4j port-forward is active in a terminal.
+2.  Run `pip install -r requirements.txt` to ensure the `openbb` SDK is installed.
+3.  Execute the script with `python graphs/etl/ingest.py`.
 
 ---
 
