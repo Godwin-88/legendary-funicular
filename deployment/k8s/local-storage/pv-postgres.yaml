@@ -1,0 +1,14 @@
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: postgres-pv
+spec:
+  capacity:
+    storage: 5Gi
+  accessModes:
+    - ReadWriteOnce
+  hostPath:
+    path: "/run/desktop/mnt/host/c/Users/USER/Desktop/DRL_PO_OCS/mlops-drl-portfolio/local-storage/postgres"
+  claimRef:
+    namespace: default
+    name: postgres-pvc

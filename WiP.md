@@ -88,6 +88,8 @@ Pivoting from a cloud-first approach to a self-hosted stack to eliminate cloud c
 
 Created Kubernetes manifests to deploy a complete, self-hosted backend infrastructure. The files are organized in `deployment/k8s/` under `minio/`, `postgres/`, and `neo4j/`.
 
+**Status: Deployed & Running.** All backend services are now operational in the local Kubernetes cluster.
+
 **Components:**
 - **Secrets:** To store credentials securely.
 - **PersistentVolumeClaims (PVCs):** To ensure data persistence for our stateful services.
@@ -117,3 +119,36 @@ Use `kubectl port-forward` to access services from your local machine. For examp
   ```
   *Access the HTTP console at: `http://localhost:8474`*
   *Connect clients to the Bolt port at: `bolt://localhost:8687`*
+
+## Step 6: Implemented Comprehensive Graph Schema
+
+Upgraded the graph schema in `graphs/schema.cql` to a production-grade version tailored for a hedge fund / investment bank context. 
+
+**Key Features:**
+- Models a wide range of financial, blockchain, market, and ML entities.
+- Includes robust constraints and indexes for data integrity and query performance.
+- Establishes clear data lineage and audit trails for compliance.
+
+---
+
+## Appendix: How to Move the Project Directory
+
+Moving the project directory is possible, but it requires careful steps to avoid breaking the Kubernetes storage setup.
+
+**The Issue:** The `PersistentVolume` manifests in `deployment/k8s/local-storage/` contain a hardcoded, absolute `hostPath` to the project's current location. If you move the project folder, this path becomes invalid, and the pods will fail to start.
+
+**Safe Procedure to Move the Project:**
+
+1.  **Clean Up Kubernetes:** Delete all the running project resources to safely release the storage volumes.
+    ```sh
+    kubectl delete -k deployment/k8s/
+    ```
+2.  **Move the Directory:** Move the entire project folder to the new location (e.g., an external drive).
+3.  **Find the New Path:** Determine the new absolute path to the `local-storage` directory. For example, if you move it to `E:\my-project`, the new path for Kubernetes would be `/run/desktop/mnt/host/e/my-project/local-storage/...`
+4.  **Update Manifests:** Edit the three `PersistentVolume` YAML files in `deployment/k8s/local-storage/` and update the `hostPath` value in each to the new path.
+5.  **Re-deploy:** Navigate to the new project directory in your terminal and run the apply command again.
+    ```sh
+    kubectl apply -k deployment/k8s/
+    ```
+
+**Performance Note:** File access on an external drive (especially a standard HDD) may be slower than an internal SSD, which could impact Docker build times and database performance.

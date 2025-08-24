@@ -1,3 +1,6 @@
+# Data Sourcing
+openbb
+
 # MLOps & Orchestration
 mlflow
 dvc[s3]
